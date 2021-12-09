@@ -1,12 +1,13 @@
-from rootDir import ROOT_DIR
+# from rootDir import ROOT_DIRT_DIR
 
 
 class Constants:
+    ROOT_DIRT_DIR = 'C:\\Users\\Michał Pilichowski\\PycharmProjects\\ZUMNLP_PROJ2\\'
     DATA_DIR_NAME = 'data'
 
     # Path to file containing ids of twits for download.
     TWEET_ID_FILENAME = 'pl_covid_tweets_clean.txt'
-    TWEET_ID_FILE_WITH_PATH = f'{ROOT_DIR}/{DATA_DIR_NAME}/{TWEET_ID_FILENAME}'
+    TWEET_ID_FILE_WITH_PATH = f'{ROOT_DIRT_DIR}/{DATA_DIR_NAME}/{TWEET_ID_FILENAME}'
 
     # Paths to files containing twitter api credentials.
     TWITTER_API_CRED_FILE_PATH = 'D:\\t_creds\\'
@@ -16,12 +17,12 @@ class Constants:
     ACCESS_TOKEN_SECRET_FILE_PATH = f'{TWITTER_API_CRED_FILE_PATH}access_token_secret.txt'
 
     # Path to created file containing twitter id, text and sentiment.
-    DATASET_FILE_PATH = f'{ROOT_DIR}/{DATA_DIR_NAME}/twitter.csv'
+    DATASET_FILE_PATH = f'{ROOT_DIRT_DIR}/{DATA_DIR_NAME}/twitter.csv'
     COL_TWEET_ID = 'TWEET_ID'
     COL_TWEET_TEXT = 'TEXT'
     COL_TWEET_SENTIMENT = 'SENTIMENT'
 
-    USED_IDS_FILENAME = f'{ROOT_DIR}/{DATA_DIR_NAME}/used_indexes.txt'
+    USED_IDS_FILENAME = f'{ROOT_DIRT_DIR}/{DATA_DIR_NAME}/used_indexes.txt'
 
     # Regular expressions for removing unnecessary elements.
     REGEX_URL = r'https?://\S+|www\.\S+'

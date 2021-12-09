@@ -1,6 +1,5 @@
 import time
 import winsound
-
 import pandas as pd
 
 from pilichm.main.ClassicML import run_classical_model
@@ -24,7 +23,7 @@ if __name__ == '__main__':
     # run_classical_model(dataset=data, model_name='SVC', display_diagrams=True)
 
     # Logistic Regression.
-    run_classical_model(dataset=data, model_name='LogisticRegression', display_diagrams=True)
+    # run_classical_model(dataset=data, model_name='LogisticRegression', display_diagrams=True)
 
     data.to_csv(Constants.DATASET_FILE_PATH, sep='\t', index=False)
 
