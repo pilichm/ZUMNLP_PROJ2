@@ -81,7 +81,7 @@ def run_classical_model(dataset, model_name, display_diagrams=False):
     df.columns = ['neg', 'neut', 'pos', 'prediction']
 
     # Display confusion matrix and roc curves for model
-    if display_diagrams and Utils.is_run_from_co_lab():
+    if display_diagrams and not Utils.is_run_from_co_lab():
         plot_roc_for_three_labels(y_test, df, ['neg', 'neut', 'pos'])
         plot_conf_matrix(y_test, df['prediction'], clf.classes_, ['neg', 'neut', 'pos'])
 
