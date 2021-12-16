@@ -1,8 +1,14 @@
 # from rootDir import ROOT_DIRT_DIR
+from pilichm.main import Utils
+from IPython import get_ipython
 
 
 class Constants:
-    ROOT_DIRT_DIR = 'C:\\Users\\Michał Pilichowski\\PycharmProjects\\ZUMNLP_PROJ2\\'
+    if 'google.colab' in str(get_ipython()):
+        ROOT_DIRT_DIR = '/content/sample_data/ZUMNLP_PROJ2/'
+    else:
+        ROOT_DIRT_DIR = 'C:\\Users\\Michał Pilichowski\\PycharmProjects\\ZUMNLP_PROJ2\\'
+
     DATA_DIR_NAME = 'data'
 
     # Path to file containing ids of twits for download.
@@ -20,6 +26,7 @@ class Constants:
     DATASET_FILE_PATH = f'{ROOT_DIRT_DIR}/{DATA_DIR_NAME}/twitter.csv'
     COL_TWEET_ID = 'TWEET_ID'
     COL_TWEET_TEXT = 'TEXT'
+    COL_CLEANED_TEXT = 'CLEANED_TEXT'
     COL_TWEET_SENTIMENT = 'SENTIMENT'
 
     USED_IDS_FILENAME = f'{ROOT_DIRT_DIR}/{DATA_DIR_NAME}/used_indexes.txt'
@@ -32,5 +39,4 @@ class Constants:
     SIGNAL_DURATION = 500
     SIGNAL_FREQ = 440
 
-
-
+    PATH_TO_NN_MODEL = f'{ROOT_DIRT_DIR}/{DATA_DIR_NAME}/model.md'

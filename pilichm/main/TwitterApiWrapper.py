@@ -91,59 +91,76 @@ class TwitterApiWrapper:
 
         # print(used_indexes)
 
+        indexes = []
         for i in range(start_index, end_index):
-            print(f'I: {i}')
+            # print(f'I: {i}')
             if num_to_download > 0:
 
                 # Save data in packs of 10.
-                if i != 0 and i % 10 == 0:
-                    print('Saving.')
-                    output_dataset.to_csv(Constants.DATASET_FILE_PATH, sep='\t', index=False)
 
-                    with open(Constants.USED_IDS_FILENAME, 'w') as f:
-                        for index in used_indexes:
-                            f.write(f'{index}\n')
+                # if i != 0 and i % 10 == 0:
+                #     print('Saving.')
+                #     output_dataset.to_csv(Constants.DATASET_FILE_PATH, sep='\t', index=False)
+                #
+                #     with open(Constants.USED_IDS_FILENAME, 'w') as f:
+                #         for index in used_indexes:
+                #             f.write(f'{index}\n')
 
                 current_tweet_id = input_dataset.loc[i, 'tweet_id']
-                print(f'Current id: {current_tweet_id}')
+                # print(f'Current id: {current_tweet_id}')
 
                 # print(f'{str(current_tweet_id)} in {used_indexes} ? {current_tweet_id in used_indexes}')
 
                 if str(current_tweet_id) not in used_indexes:
-                    try:
-                        used_indexes.append(current_tweet_id)
-                        tweet = self.api.get_status(current_tweet_id)
-                        tweet_text = tweet.text.rstrip()
-                        tweet_text = tweet_text.replace('\n', ' ')
-                        print(f'Current tweet text: {tweet_text}')
+                    indexes.append(current_tweet_id)
+                    used_indexes.append(current_tweet_id)
+                    # print('APPENDING')
+                    # print(f'APPENDED LEN {len(indexes)}')
+                    num_to_download -= 1
+                    if len(indexes) == 100:
+                        try:
+                            # used_indexes.append(current_tweet_id)
+                            # tweet = self.api.get_status(current_tweet_id)
+                            tweet_list = self.api.lookup_statuses(indexes)
+                            # print(f'Call res: {tweet_list}')
+                            for tweet in tweet_list:
+                                tweet_text = tweet.text.rstrip()
+                                tweet_text = tweet_text.replace('\n', ' ')
+                                print(f'Current tweet text: {tweet_text}')
 
-                        new_data = {
-                            Constants.COL_TWEET_ID: current_tweet_id,
-                            Constants.COL_TWEET_TEXT: tweet_text,
-                            Constants.COL_TWEET_SENTIMENT: 'brak'
-                        }
+                                new_data = {
+                                    Constants.COL_TWEET_ID: tweet.id,
+                                    Constants.COL_TWEET_TEXT: tweet_text,
+                                    Constants.COL_TWEET_SENTIMENT: 'brak'
+                                }
 
-                        print(new_data)
-                        output_dataset = output_dataset.append(new_data, ignore_index=True)
+                                print(new_data)
+                                output_dataset = output_dataset.append(new_data, ignore_index=True)
+                                output_dataset.to_csv(Constants.DATASET_FILE_PATH, sep='\t', index=False)
 
-                        num_to_download -= 1
-                    except tweepy.errors.NotFound:
-                        print(f'No tweet found for id: {current_tweet_id}')
-                    except tweepy.errors.Forbidden:
-                        print(f'User suspended for tweet of id: {current_tweet_id}')
-                    except tweepy.errors.TooManyRequests:
-                        print('429 Too Many Requests')
-                        print('Saving.')
-                        output_dataset.to_csv(Constants.DATASET_FILE_PATH, sep='\t', index=False)
+                            with open(Constants.USED_IDS_FILENAME, 'w') as f:
+                                for index in used_indexes:
+                                    f.write(f'{index}\n')
+                                # break
 
-                        with open(Constants.USED_IDS_FILENAME, 'w') as f:
-                            for index in used_indexes:
-                                f.write(f'{index}\n')
-                        break
+                        except tweepy.errors.NotFound:
+                            print(f'No tweet found for id: {current_tweet_id}')
+                        except tweepy.errors.Forbidden:
+                            print(f'User suspended for tweet of id: {current_tweet_id}')
+                        except tweepy.errors.TooManyRequests:
+                            print('429 Too Many Requests')
+                            print('Saving.')
+                            output_dataset.to_csv(Constants.DATASET_FILE_PATH, sep='\t', index=False)
 
-                    sleep(0.5)
+                            with open(Constants.USED_IDS_FILENAME, 'w') as f:
+                                for index in used_indexes:
+                                    f.write(f'{index}\n')
+                            break
+
+                        sleep(0.5)
+                        indexes.clear()
             else:
-                print('Saving.')
+                print('Downloaded required amount - saving.')
                 output_dataset.to_csv(Constants.DATASET_FILE_PATH, sep='\t', index=False)
 
                 with open(Constants.USED_IDS_FILENAME, 'w') as f:
