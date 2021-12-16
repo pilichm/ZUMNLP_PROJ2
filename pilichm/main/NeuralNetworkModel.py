@@ -29,9 +29,9 @@ def change_sentiment(sentiment):
 
 
 def run_neural_network_model(dataset, epoch_count=1, display_diagrams=False, save_model=False, read_model=False):
-    data = dataset[[Constants.COL_TWEET_TEXT, Constants.COL_TWEET_SENTIMENT.lower()]]
+    data = dataset[[Constants.COL_CLEANED_TEXT, Constants.COL_TWEET_SENTIMENT.lower()]]
 
-    x = data[Constants.COL_TWEET_TEXT]
+    x = data[Constants.COL_CLEANED_TEXT]
     y = data[Constants.COL_TWEET_SENTIMENT.lower()]
     print('Input labels before:')
     print(y.value_counts())

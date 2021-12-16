@@ -29,11 +29,11 @@ def get_class(row):
 
 # Split dataset and prepare train, test and validation.
 def prepare_data(dataset):
-    data = dataset[[Constants.COL_TWEET_TEXT, Constants.COL_TWEET_SENTIMENT.lower()]].head(6000)
+    data = dataset[[Constants.COL_CLEANED_TEXT, Constants.COL_TWEET_SENTIMENT.lower()]].head(6000)
     # print(data.head())
 
     # Create train, test and validation datasets.
-    x = data[Constants.COL_TWEET_TEXT]
+    x = data[Constants.COL_CLEANED_TEXT]
     y = data[Constants.COL_TWEET_SENTIMENT.lower()]
 
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.5, random_state=11)
