@@ -28,28 +28,37 @@ def change_sentiment(sentiment):
         return 0
 
 
-def run_neural_network_model(dataset, epoch_count=1, display_diagrams=False, save_model=False, read_model=False):
-    data = dataset[[Constants.COL_CLEANED_TEXT, Constants.COL_TWEET_SENTIMENT.lower()]]
+def run_neural_network_model(path_to_csv, epoch_count=25, display_diagrams=False, save_model=False, read_model=False):
 
-    x = data[Constants.COL_CLEANED_TEXT]
-    y = data[Constants.COL_TWEET_SENTIMENT.lower()]
-    print('Input labels before:')
-    print(y.value_counts())
-    y = y.apply(lambda line: change_sentiment(line))
-    print('Input labels after:')
-    print(y.value_counts())
-    data = []
-    data_to_list = x.values.tolist()
-    for i in range(len(data_to_list)):
-        data.append((data_to_list[i]))
+    data_list = []
+    labels = []
+    for chunk in pd.read_csv(path_to_csv, delimiter='\t', chunksize=2_000,
+                             usecols=[Constants.COL_CLEANED_TEXT, Constants.COL_TWEET_SENTIMENT.lower()]):
+        data_to_list = chunk[Constants.COL_CLEANED_TEXT].values.tolist()
+        labels_to_list = chunk[Constants.COL_TWEET_SENTIMENT.lower()].values.tolist()
+        for data, label in zip(data_to_list, labels_to_list):
+            data_list.append(data)
+            labels.append(label)
 
-    data = np.array(data)
+    # x = df[Constants.COL_CLEANED_TEXT]
+    # y = df[Constants.COL_TWEET_SENTIMENT.lower()]
+    # print('Input labels before:')
+    # print(y.value_counts())
+    # y = y.apply(lambda line: change_sentiment(line))
+    # print('Input labels after:')
+    # print(y.value_counts())
+    # data = []
+    # data_to_list = x.values.tolist()
+    # for i in range(len(data_to_list)):
+    #     data.append((data_to_list[i]))
+
+    data = np.array(data_list)
 
     max_words = 5000
     max_len = 200
 
-    y = np.array(y)
-    labels = tf.keras.utils.to_categorical(y, 3, dtype="float32")
+    # y = np.array(y)
+    labels = tf.keras.utils.to_categorical(labels, 3, dtype="float32")
 
     # print(type(data))
     # print(data)
@@ -62,7 +71,7 @@ def run_neural_network_model(dataset, epoch_count=1, display_diagrams=False, sav
     # train_data = TensorDataset(torch.tensor(x_train), torch.tensor(y_train))
     # test_data = TensorDataset(torch.tensor(x_test), torch.tensor(y_test))
 
-    x_train, x_test, y_train, y_test = train_test_split(tweets, labels, random_state=0, stratify=labels, test_size=0.3)
+    x_train, x_test, y_train, y_test = train_test_split(tweets, labels, random_state=0, test_size=0.3)
 
     print(pd.DataFrame(data=y_test).value_counts())
 

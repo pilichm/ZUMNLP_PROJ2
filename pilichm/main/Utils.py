@@ -103,36 +103,38 @@ def stem_line(line):
 
 
 # Remove urls, emails, punctuation, emo, repetitions and apostrophes.
-def clean_data(data):
+def clean_data(path_to_csv):
     url_pattern = re.compile(Constants.REGEX_URL)
     letters_pattern = re.compile(Constants.REGEX_POLISH_CHARS)
     nlp = spacy.load('pl_core_news_sm')
+    df = pd.read_csv(path_to_csv, delimiter='\t')
 
     # Remove urls.
-    data[Constants.COL_CLEANED_TEXT] = data[Constants.COL_TWEET_TEXT] \
+    df[Constants.COL_CLEANED_TEXT] = df[Constants.COL_TWEET_TEXT]\
         .apply(lambda text: url_pattern.sub(r' ', text))
 
     # Remove emails.
-    data[Constants.COL_CLEANED_TEXT] = data[Constants.COL_CLEANED_TEXT] \
+    df[Constants.COL_CLEANED_TEXT] = df[Constants.COL_CLEANED_TEXT]\
         .apply(lambda text: re.sub(Constants.REGEX_EMAIL, ' ', text))
 
     # Remove all characters that aren't polish letters.
-    data[Constants.COL_CLEANED_TEXT] = data[Constants.COL_CLEANED_TEXT] \
+    df[Constants.COL_CLEANED_TEXT] = df[Constants.COL_CLEANED_TEXT] \
         .apply(lambda text: letters_pattern.sub(r'', text))
 
     # Remove stop words.
-    data[Constants.COL_CLEANED_TEXT] = data[Constants.COL_CLEANED_TEXT] \
+    df[Constants.COL_CLEANED_TEXT] = df[Constants.COL_CLEANED_TEXT] \
         .apply(lambda text: remove_stop_and_single_words_and_stem(text, nlp))
 
     # Remove repetitions.
-    data[Constants.COL_CLEANED_TEXT] = data[Constants.COL_CLEANED_TEXT] \
+    df[Constants.COL_CLEANED_TEXT] = df[Constants.COL_CLEANED_TEXT] \
         .apply(lambda text: remove_repetitions(text))
 
     # Tokenize - stemming.
-    data[Constants.COL_CLEANED_TEXT] = data[Constants.COL_CLEANED_TEXT] \
+    df[Constants.COL_CLEANED_TEXT] = df[Constants.COL_CLEANED_TEXT] \
         .apply(lambda text: stem_line(text))
 
-    return data
+    df.dropna(inplace=True)
+    df.to_csv(path_to_csv, sep='\t', index=False)
 
 
 def get_sentiments(text, words_dict):
@@ -160,9 +162,12 @@ def get_sentiments(text, words_dict):
 
 
 # Add sentiment labels to tweets in dataset.
-def create_labels(dataset, num_of_classes=3):
+def create_labels(path_to_csv, num_of_classes=3):
     # Create word embeddings.
-    sent = [row for row in dataset[Constants.COL_CLEANED_TEXT]]
+    df = pd.read_csv(path_to_csv, delimiter='\t')
+    sent = [row for row in df[Constants.COL_CLEANED_TEXT] if not pd.isna(row)]
+    # for line in sent:
+    #     print(f'Line {line} | of type {type(line)}')
     phrases = Phrases(sent, min_count=1, progress_per=50000)
     bigram = Phraser(phrases)
     sentences = bigram[sent]
@@ -241,14 +246,14 @@ def create_labels(dataset, num_of_classes=3):
     words["sentiments"] = words["cluster_value"].map(emotion)
     words_dict = dict(zip(words.words, words.cluster_value))
 
-    dataset["sentiment"] = dataset[Constants.COL_CLEANED_TEXT].apply(lambda text: get_sentiments(text, words_dict))
+    df["sentiment"] = df[Constants.COL_CLEANED_TEXT].apply(lambda text: get_sentiments(text, words_dict))
 
-    print(f"{dataset['sentiment'].value_counts()}")
+    print(f"{df['sentiment'].value_counts()}")
 
     # for key, value in words_dict.items():
     #     print(f'{key} = {value}')
 
-    return dataset
+    df.to_csv(path_to_csv, sep='\t', index=False)
 
 
 # Checks if code is run from google colan.
@@ -257,16 +262,17 @@ def is_run_from_co_lab():
     return 'google.colab' in str(get_ipython())
 
 
-def display_sentiment_distribution(data):
+def display_sentiment_distribution(path_to_csv):
     emotion = {0: "neutral",
                1: "positive",
                -1: "negative"}
 
-    data["sentiment"] = data["sentiment"].map(emotion)
+    df = pd.read_csv(path_to_csv, delimiter='\t')
+    df["sentiment"] = df["sentiment"].map(emotion)
     fig = plt.gcf()
     fig.set_size_inches(7, 7)
     colors = ["cyan", "pink", "yellow"]
-    df_pie = data["sentiment"].value_counts().reset_index()
+    df_pie = df["sentiment"].value_counts().reset_index()
     plt.pie(df_pie["sentiment"], labels=df_pie["index"], radius=2, colors=colors, autopct="%1.1f%%")
     plt.axis('equal')
     plt.title("Dystrybucja sentymentów ", fontsize=20)
