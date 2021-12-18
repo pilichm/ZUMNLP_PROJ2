@@ -7,7 +7,7 @@ from IPython import get_ipython
 from matplotlib import pyplot as plt
 from nltk import PorterStemmer
 import multiprocessing
-
+import pl_core_news_sm
 from gensim.models import Word2Vec
 from gensim.models.phrases import Phrases, Phraser
 from sklearn.cluster import KMeans
@@ -106,7 +106,7 @@ def stem_line(line):
 def clean_data(path_to_csv):
     url_pattern = re.compile(Constants.REGEX_URL)
     letters_pattern = re.compile(Constants.REGEX_POLISH_CHARS)
-    nlp = spacy.load('pl_core_news_sm')
+    nlp = pl_core_news_sm.load()
     df = pd.read_csv(path_to_csv, delimiter='\t')
 
     # Remove urls.

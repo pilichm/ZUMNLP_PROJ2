@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     # data = pd.read_csv(Constants.DATASET_FILE_PATH, delimiter='\t')
     # data['CLEANED_TEXT'] = '_'
-    # Utils.clean_data(path_to_csv=Constants.DATASET_FILE_PATH)
+    Utils.clean_data(path_to_csv=Constants.DATASET_FILE_PATH)
     # data = Utils.create_labels(path_to_csv=Constants.DATASET_FILE_PATH)
 
 
@@ -38,7 +38,7 @@ if __name__ == '__main__':
     # Neural Network Model.
 
     # data.to_csv(Constants.DATASET_FILE_PATH, sep='\t', index=False)
-    run_neural_network_model(path_to_csv=Constants.DATASET_FILE_PATH, display_diagrams=True, read_model=False, save_model=True)
+    # run_neural_network_model(path_to_csv=Constants.DATASET_FILE_PATH, display_diagrams=True, read_model=False, save_model=True)
 
     print(f"Execution time: {round(time.time() - start_time, 2)} seconds")
     print(f"Execution time: {round((time.time() - start_time) / 60, 2)} minutes")
