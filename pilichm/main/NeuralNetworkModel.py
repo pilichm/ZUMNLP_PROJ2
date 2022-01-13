@@ -28,7 +28,39 @@ def change_sentiment(sentiment):
         return 0
 
 
-def run_neural_network_model(path_to_csv, epoch_count=25, display_diagrams=False, save_model=False, read_model=False):
+def get_model(model_name, max_words, max_len, num_of_labels):
+    model = Sequential()
+
+    # Return dense model.
+    if model_name == 'dense':
+        model.add(layers.Embedding(max_words, 40, input_length=max_len))
+        model.add(layers.Flatten())
+        model.add(layers.Dense(30, activation='relu'))
+        model.add(layers.Dense(20, activation='relu'))
+        model.add(layers.Dense(10, activation='relu'))
+        model.add(layers.Dense(num_of_labels, activation='softmax'))
+        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    # Return Bidirectional LSTM model.
+    elif model_name == 'lstm':
+        model.add(layers.Embedding(max_words, 40, input_length=max_len))
+        model.add(layers.Bidirectional(layers.LSTM(20, dropout=0.05)))
+        model.add(layers.Flatten())
+        model.add(layers.Dense(num_of_labels, activation='softmax'))
+        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    # Return Bidirectional LSTM with convolution layer.
+    else:
+        model.add(layers.Embedding(max_words, 40, input_length=max_len))
+        model.add(layers.Conv1D(20, 6, activation='relu', kernel_regularizer=regularizers.l1_l2(l1=2e-3, l2=2e-3),
+                                bias_regularizer=regularizers.l2(2e-3)))
+        model.add(layers.MaxPooling1D(5))
+        model.add(layers.Bidirectional(layers.LSTM(20, dropout=0.6)))
+        model.add(layers.Dense(3, activation='softmax'))
+        model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
+
+    return model
+
+
+def run_neural_network_model(path_to_csv, epoch_count=25, display_diagrams=False, save_model=False, read_model=False, model_name='lstm'):
 
     data_list = []
     labels = []
@@ -40,50 +72,24 @@ def run_neural_network_model(path_to_csv, epoch_count=25, display_diagrams=False
             data_list.append(data)
             labels.append(label)
 
-    # x = df[Constants.COL_CLEANED_TEXT]
-    # y = df[Constants.COL_TWEET_SENTIMENT.lower()]
-    # print('Input labels before:')
-    # print(y.value_counts())
-    # y = y.apply(lambda line: change_sentiment(line))
-    # print('Input labels after:')
-    # print(y.value_counts())
-    # data = []
-    # data_to_list = x.values.tolist()
-    # for i in range(len(data_to_list)):
-    #     data.append((data_to_list[i]))
-
     data = np.array(data_list)
 
     max_words = 5000
     max_len = 200
 
-    # y = np.array(y)
     labels = tf.keras.utils.to_categorical(labels, 3, dtype="float32")
-
-    # print(type(data))
-    # print(data)
 
     tokenizer = Tokenizer(num_words=max_words)
     tokenizer.fit_on_texts(data)
     sequences = tokenizer.texts_to_sequences(data)
     tweets = pad_sequences(sequences, maxlen=max_len)
 
-    # train_data = TensorDataset(torch.tensor(x_train), torch.tensor(y_train))
-    # test_data = TensorDataset(torch.tensor(x_test), torch.tensor(y_test))
-
     x_train, x_test, y_train, y_test = train_test_split(tweets, labels, random_state=0, test_size=0.3)
 
     print(pd.DataFrame(data=y_test).value_counts())
 
     if not read_model:
-        model = Sequential()
-        model.add(layers.Embedding(max_words, 40, input_length=max_len))
-        model.add(layers.Conv1D(20, 6, activation='relu', kernel_regularizer=regularizers.l1_l2(l1=2e-3, l2=2e-3),
-                                bias_regularizer=regularizers.l2(2e-3)))
-        model.add(layers.MaxPooling1D(5))
-        model.add(layers.Bidirectional(layers.LSTM(20, dropout=0.6)))
-        model.add(layers.Dense(3, activation='softmax'))
-        model.compile(optimizer='rmsprop', loss='categorical_crossentropy', metrics=['accuracy'])
+        model = get_model(model_name=model_name, max_words=max_words, max_len=max_len, num_of_labels=3)
     else:
         model = keras.models.load_model(Constants.PATH_TO_NN_MODEL)
 
