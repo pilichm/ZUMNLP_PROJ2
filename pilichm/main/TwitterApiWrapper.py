@@ -118,6 +118,7 @@ class TwitterApiWrapper:
                     # print(f'APPENDED LEN {len(indexes)}')
                     num_to_download -= 1
                     if len(indexes) == 100:
+                        print(num_to_download)
                         try:
                             # used_indexes.append(current_tweet_id)
                             # tweet = self.api.get_status(current_tweet_id)
@@ -126,7 +127,7 @@ class TwitterApiWrapper:
                             for tweet in tweet_list:
                                 tweet_text = tweet.text.rstrip()
                                 tweet_text = tweet_text.replace('\n', ' ')
-                                print(f'Current tweet text: {tweet_text}')
+                                # print(f'Current tweet text: {tweet_text}')
 
                                 new_data = {
                                     Constants.COL_TWEET_ID: tweet.id,
@@ -134,7 +135,7 @@ class TwitterApiWrapper:
                                     Constants.COL_TWEET_SENTIMENT: 'brak'
                                 }
 
-                                print(new_data)
+                                # print(new_data)
                                 output_dataset = output_dataset.append(new_data, ignore_index=True)
                                 output_dataset.to_csv(Constants.DATASET_FILE_PATH, sep='\t', index=False)
 

@@ -110,11 +110,11 @@ def clean_data(path_to_csv):
     df = pd.read_csv(path_to_csv, delimiter='\t')
 
     # Remove urls.
-    df[Constants.COL_CLEANED_TEXT] = df[Constants.COL_TWEET_TEXT]\
+    df[Constants.COL_CLEANED_TEXT] = df[Constants.COL_TWEET_TEXT] \
         .apply(lambda text: url_pattern.sub(r' ', text))
 
     # Remove emails.
-    df[Constants.COL_CLEANED_TEXT] = df[Constants.COL_CLEANED_TEXT]\
+    df[Constants.COL_CLEANED_TEXT] = df[Constants.COL_CLEANED_TEXT] \
         .apply(lambda text: re.sub(Constants.REGEX_EMAIL, ' ', text))
 
     # Remove all characters that aren't polish letters.
@@ -131,9 +131,13 @@ def clean_data(path_to_csv):
 
     # Tokenize - stemming.
     df[Constants.COL_CLEANED_TEXT] = df[Constants.COL_CLEANED_TEXT] \
-        .apply(lambda text: stem_line(text))
+        .apply(lambda text: stem_line(text).strip())
 
     df.dropna(inplace=True)
+    df.to_csv(path_to_csv, sep='\t', index=False)
+
+    df = pd.read_csv(path_to_csv, delimiter='\t')
+    df.drop(df[pd.isnull(df[Constants.COL_CLEANED_TEXT])].index, inplace=True)
     df.to_csv(path_to_csv, sep='\t', index=False)
 
 
@@ -142,6 +146,7 @@ def get_sentiments(text, words_dict):
 
     total = 0
     count = 0
+    print(f'Current: >{text}<')
     for t in text.split(' '):
         # print(f'Current word >{t}<')
         if words_dict.get(t):
