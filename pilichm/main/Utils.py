@@ -1,15 +1,14 @@
+import multiprocessing
 import re
 
 import numpy as np
 import pandas as pd
-import spacy
-from IPython import get_ipython
-from matplotlib import pyplot as plt
-from nltk import PorterStemmer
-import multiprocessing
 import pl_core_news_sm
+from IPython import get_ipython
 from gensim.models import Word2Vec
 from gensim.models.phrases import Phrases, Phraser
+from matplotlib import pyplot as plt
+from nltk import PorterStemmer
 from sklearn.cluster import KMeans
 
 from pilichm.main.Constants import Constants
@@ -146,7 +145,7 @@ def get_sentiments(text, words_dict):
 
     total = 0
     count = 0
-    print(f'Current: >{text}<')
+    # print(f'Current: >{text}<')
     for t in text.split(' '):
         # print(f'Current word >{t}<')
         if words_dict.get(t):
