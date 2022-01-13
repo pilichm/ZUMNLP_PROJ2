@@ -40,3 +40,4 @@ class Constants:
     SIGNAL_FREQ = 440
 
     PATH_TO_NN_MODEL = f'{ROOT_DIRT_DIR}/{DATA_DIR_NAME}/model.md'
+    PATH_TO_BERT_MODEL = f'{ROOT_DIRT_DIR}/{DATA_DIR_NAME}/bert_model.md'
