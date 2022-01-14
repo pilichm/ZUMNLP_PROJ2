@@ -60,7 +60,7 @@ def get_model(model_name, max_words, max_len, num_of_labels):
     return model
 
 
-def run_neural_network_model(path_to_csv, epoch_count=25, display_diagrams=False, save_model=False, read_model=False, model_name='lstm'):
+def run_neural_network_model(path_to_csv, epoch_count=25, display_diagrams=False, save_model=False, read_model=False, model_name='brak'):
 
     data_list = []
     labels = []
